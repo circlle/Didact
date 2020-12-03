@@ -1,6 +1,6 @@
 import { createDOM, updateDOM } from './createDOM'
 import type { Element } from './createElement'
-import { Fiber, getDeletions, getNextUnitWork, getWipRoot, setDeletions, setNextUnitWork, setWipRoot } from "./fiberMeta"
+import { Fiber, getDeletions, getNextUnitWork, getWipRoot, setCurrentRoot, setDeletions, setNextUnitWork, setWipRoot } from "./fiberMeta"
 
 const commitWork = (fiber: Fiber | null) => {
   if (!fiber) return
@@ -26,12 +26,14 @@ const commitWork = (fiber: Fiber | null) => {
 const commitRoot = () => {
   // add nodes to dom
   getDeletions().forEach(commitWork)
+  console.log("deletion", getDeletions())
 
   const wipRoot = getWipRoot()
   if (!wipRoot) return
   if (!wipRoot.child) return
 
   commitWork(wipRoot?.child)
+  setCurrentRoot(wipRoot)
   setWipRoot(null)
 }
 
@@ -55,8 +57,10 @@ export const workLoop = (deadline: IdleDeadline): void => {
     shouldYield = deadline.timeRemaining() < 1
   }
 
+
   if (!getNextUnitWork() && getWipRoot()) {
     commitRoot()
+    return
   }
   requestIdleCallback(workLoop)
 }
@@ -65,6 +69,7 @@ export const workLoop = (deadline: IdleDeadline): void => {
 // requestIdleCallback(workLoop)
 
 const performUnitOfWork = (fiber: Fiber): Fiber | null => {
+  console.log("fiber", fiber)
   // add dom node
   if (!fiber.dom) {
     fiber.dom = createDOM(fiber)
@@ -94,10 +99,8 @@ const performUnitOfWork = (fiber: Fiber): Fiber | null => {
   return nextFiber
 }
 
-// todo fix problem
 function reconcileChildren(wipFiber: Fiber, elements: Element[]) {
   let index = 0
-
   let oldFiber = wipFiber.alternate && wipFiber.alternate.child
 
   let prevSibling: Fiber | null = null
@@ -123,9 +126,17 @@ function reconcileChildren(wipFiber: Fiber, elements: Element[]) {
       }
     } else {
       if (element && !sameType) {
-        // todo add this node
+        newFiber = {
+          type: element.type,
+          props: element.props,
+          dom: null,
+          parent: wipFiber,
+          alternate: null,
+          effectTag: "PLACEMENT",
+          child: null,
+          sibling: null
+        }
       }
-
       if (oldFiber && !sameType) {
         // delete the old fiber node
         oldFiber.effectTag = "DELETION"
@@ -136,7 +147,7 @@ function reconcileChildren(wipFiber: Fiber, elements: Element[]) {
 
     if (index === 0) {
       wipFiber.child = newFiber
-    } else {
+    } else if (element) {
       prevSibling && (prevSibling.sibling = newFiber)
     }
 

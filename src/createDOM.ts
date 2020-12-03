@@ -1,4 +1,4 @@
-import type { Fiber } from './concurrent'
+import type { Fiber } from './fiberMeta'
 import { TEXT_ELEMENT_LITERAL } from './createElement'
 
 const isProperty = (key: string) => key !== 'children' && !isEvent(key)
@@ -51,13 +51,15 @@ const updateDOM = (dom: HTMLElement | Text, prevProps?: Fiber['props'], nextProp
   Object.keys(prevProps)
     .filter(isProperty)
     .filter(isGone(prevProps, nextProps))
-    .forEach((name) => (dom as HTMLElement).setAttribute(name, ''))
+    .forEach(name => dom[name] = "")
 
   // set new or changed properties
   Object.keys(nextProps)
     .filter(isProperty)
     .filter(isNew(prevProps, nextProps))
-    .forEach((name) => (dom as HTMLElement).setAttribute(name, nextProps[name]))
+    .forEach((name) => {
+      dom[name] = nextProps[name]
+    })
 }
 
 export { createDOM, updateDOM }

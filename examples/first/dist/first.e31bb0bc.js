@@ -298,11 +298,11 @@ var updateDOM = function updateDOM(dom, prevProps, nextProps) {
   }); // remove old properties
 
   Object.keys(prevProps).filter(isProperty).filter(isGone(prevProps, nextProps)).forEach(function (name) {
-    return dom.setAttribute(name, '');
+    return dom[name] = "";
   }); // set new or changed properties
 
   Object.keys(nextProps).filter(isProperty).filter(isNew(prevProps, nextProps)).forEach(function (name) {
-    return dom.setAttribute(name, nextProps[name]);
+    dom[name] = nextProps[name];
   });
 };
 
@@ -354,10 +354,12 @@ var commitWork = function commitWork(fiber) {
 var commitRoot = function commitRoot() {
   // add nodes to dom
   fiberMeta_1.getDeletions().forEach(commitWork);
+  console.log("deletion", fiberMeta_1.getDeletions());
   var wipRoot = fiberMeta_1.getWipRoot();
   if (!wipRoot) return;
   if (!wipRoot.child) return;
   commitWork(wipRoot === null || wipRoot === void 0 ? void 0 : wipRoot.child);
+  fiberMeta_1.setCurrentRoot(wipRoot);
   fiberMeta_1.setWipRoot(null);
 };
 
@@ -386,6 +388,7 @@ var workLoop = function workLoop(deadline) {
 
   if (!fiberMeta_1.getNextUnitWork() && fiberMeta_1.getWipRoot()) {
     commitRoot();
+    return;
   }
 
   requestIdleCallback(exports.workLoop);
@@ -395,7 +398,8 @@ exports.workLoop = workLoop; // react 内部已经不再使用 requestIdleCallba
 // requestIdleCallback(workLoop)
 
 var performUnitOfWork = function performUnitOfWork(fiber) {
-  // add dom node
+  console.log("fiber", fiber); // add dom node
+
   if (!fiber.dom) {
     fiber.dom = createDOM_1.createDOM(fiber);
   } // 可能会看到残缺的 ui。 需要去监听 根 fiber,
@@ -420,8 +424,7 @@ var performUnitOfWork = function performUnitOfWork(fiber) {
   }
 
   return nextFiber;
-}; // todo fix problem
-
+};
 
 function reconcileChildren(wipFiber, elements) {
   var index = 0;
@@ -447,7 +450,17 @@ function reconcileChildren(wipFiber, elements) {
         sibling: null
       };
     } else {
-      if (element && !sameType) {// todo add this node
+      if (element && !sameType) {
+        newFiber = {
+          type: element.type,
+          props: element.props,
+          dom: null,
+          parent: wipFiber,
+          alternate: null,
+          effectTag: "PLACEMENT",
+          child: null,
+          sibling: null
+        };
       }
 
       if (oldFiber && !sameType) {
@@ -459,7 +472,7 @@ function reconcileChildren(wipFiber, elements) {
 
     if (index === 0) {
       wipFiber.child = newFiber;
-    } else {
+    } else if (element) {
       prevSibling && (prevSibling.sibling = newFiber);
     }
 
@@ -528,16 +541,12 @@ var _index = _interopRequireDefault(require("../../src/index"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_index.default.render(_index.default.createElement("div", null, _index.default.createElement("p", null, _index.default.createElement("span", null, "1"))), document.getElementById("root")); // Didact.render(
-//   <div>
-//     <p>
-//       <span>1</span>
-//     </p>
-//     <span></span>
-//   </div>,
-//   document.getElementById("root")
-// )
-},{"../../src/index":"../../src/index.ts"}],"../../../../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+_index.default.render(_index.default.createElement("div", null, _index.default.createElement("p", null, _index.default.createElement("span", null, "1"))), document.getElementById("root"));
+
+setTimeout(function () {
+  _index.default.render(_index.default.createElement("div", null, _index.default.createElement("p", null, _index.default.createElement("span", null, "3")), _index.default.createElement("span", null)), document.getElementById("root"));
+}, 1000 * 5);
+},{"../../src/index":"../../src/index.ts"}],"../../../../../Users/kxzha/AppData/Roaming/npm-cache/_npx/6732/node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -565,7 +574,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54460" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55728" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -741,5 +750,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../../../../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","index.js"], null)
+},{}]},{},["../../../../../Users/kxzha/AppData/Roaming/npm-cache/_npx/6732/node_modules/parcel/src/builtins/hmr-runtime.js","index.js"], null)
 //# sourceMappingURL=/first.e31bb0bc.js.map
