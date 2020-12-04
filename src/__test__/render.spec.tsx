@@ -1,5 +1,5 @@
-import Didact from "./index"
-import { render } from "./render"
+import Didact from "../index"
+import { render } from "../render"
 
 describe("render", () => {
   it('render function', () => {

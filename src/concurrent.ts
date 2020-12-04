@@ -26,7 +26,6 @@ const commitWork = (fiber: Fiber | null) => {
 const commitRoot = () => {
   // add nodes to dom
   getDeletions().forEach(commitWork)
-  console.log("deletion", getDeletions())
 
   const wipRoot = getWipRoot()
   if (!wipRoot) return
@@ -69,7 +68,6 @@ export const workLoop = (deadline: IdleDeadline): void => {
 // requestIdleCallback(workLoop)
 
 const performUnitOfWork = (fiber: Fiber): Fiber | null => {
-  console.log("fiber", fiber)
   // add dom node
   if (!fiber.dom) {
     fiber.dom = createDOM(fiber)

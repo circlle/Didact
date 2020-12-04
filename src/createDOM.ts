@@ -12,12 +12,10 @@ const createDOM = (fiber: Fiber): HTMLElement | Text => {
   if (fiber.type === TEXT_ELEMENT_LITERAL) {
     dom = document.createTextNode(fiber.props.nodeValue)
   } else {
-    const innerDom = (dom = document.createElement(fiber.type))
-
-    Object.keys(fiber.props)
-      .filter(isProperty)
-      .forEach((name) => innerDom.setAttribute(name, fiber.props[name]))
+    dom = document.createElement(fiber.type)
   }
+  // todo: create fake prevProps
+  updateDOM(dom, { children: [] }, fiber.props)
 
   return dom
 }

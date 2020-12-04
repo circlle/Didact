@@ -1,5 +1,5 @@
-import { createElement, createTextElement, TEXT_ELEMENT_LITERAL } from './createElement'
-import type { Element } from './createElement'
+import { createElement, createTextElement, TEXT_ELEMENT_LITERAL } from '../createElement'
+import type { Element } from '../createElement'
 
 describe('createElement', () => {
   it('only tag', () => {

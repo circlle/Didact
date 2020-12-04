@@ -271,12 +271,13 @@ var createDOM = function createDOM(fiber) {
   if (fiber.type === createElement_1.TEXT_ELEMENT_LITERAL) {
     dom = document.createTextNode(fiber.props.nodeValue);
   } else {
-    var innerDom_1 = dom = document.createElement(fiber.type);
-    Object.keys(fiber.props).filter(isProperty).forEach(function (name) {
-      return innerDom_1.setAttribute(name, fiber.props[name]);
-    });
-  }
+    dom = document.createElement(fiber.type);
+  } // todo: create fake prevProps
 
+
+  updateDOM(dom, {
+    children: []
+  }, fiber.props);
   return dom;
 };
 
@@ -354,7 +355,6 @@ var commitWork = function commitWork(fiber) {
 var commitRoot = function commitRoot() {
   // add nodes to dom
   fiberMeta_1.getDeletions().forEach(commitWork);
-  console.log("deletion", fiberMeta_1.getDeletions());
   var wipRoot = fiberMeta_1.getWipRoot();
   if (!wipRoot) return;
   if (!wipRoot.child) return;
@@ -398,8 +398,7 @@ exports.workLoop = workLoop; // react 内部已经不再使用 requestIdleCallba
 // requestIdleCallback(workLoop)
 
 var performUnitOfWork = function performUnitOfWork(fiber) {
-  console.log("fiber", fiber); // add dom node
-
+  // add dom node
   if (!fiber.dom) {
     fiber.dom = createDOM_1.createDOM(fiber);
   } // 可能会看到残缺的 ui。 需要去监听 根 fiber,
@@ -541,12 +540,18 @@ var _index = _interopRequireDefault(require("../../src/index"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_index.default.render(_index.default.createElement("div", null, _index.default.createElement("p", null, _index.default.createElement("span", null, "1"))), document.getElementById("root"));
+var count = 0;
 
-setTimeout(function () {
-  _index.default.render(_index.default.createElement("div", null, _index.default.createElement("p", null, _index.default.createElement("span", null, "3")), _index.default.createElement("span", null)), document.getElementById("root"));
-}, 1000 * 5);
-},{"../../src/index":"../../src/index.ts"}],"../../../../../Users/kxzha/AppData/Roaming/npm-cache/_npx/6732/node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+function rerender() {
+  count++;
+
+  _index.default.render(_index.default.createElement("div", null, _index.default.createElement("p", null, _index.default.createElement("span", null, count)), _index.default.createElement("button", {
+    onClick: rerender
+  }, "\u589E\u52A0")), document.getElementById("root"));
+}
+
+rerender();
+},{"../../src/index":"../../src/index.ts"}],"../../../../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -574,7 +579,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55728" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58941" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -750,5 +755,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../../../../../Users/kxzha/AppData/Roaming/npm-cache/_npx/6732/node_modules/parcel/src/builtins/hmr-runtime.js","index.js"], null)
+},{}]},{},["../../../../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","index.js"], null)
 //# sourceMappingURL=/first.e31bb0bc.js.map

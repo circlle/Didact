@@ -1,26 +1,19 @@
 import Didact from "../../src/index"
 
-Didact.render(
-  <div>
-    <p>
-      <span>1</span>
-    </p>
-  </div>,
-  document.getElementById("root")
-)
+let count = 0
 
-setTimeout(
-  () => {
-    Didact.render(
-      <div>
-        <p>
-          <span>3</span>
-        </p>
-        <span></span>
-      </div>,
-      document.getElementById("root")
-    )
-  },
-  1000 * 5
-)
+function rerender() {
+  count++
+  Didact.render(
+    <div>
+      <p>
+        <span>{count}</span>
+      </p>
+      <button onClick={rerender}>增加</button>
+    </div>,
+    document.getElementById("root")
+  )
+}
+
+rerender()
 
