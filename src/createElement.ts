@@ -1,4 +1,6 @@
-export type ElementType = string
+import { Component } from "./component"
+
+export type ElementType = string | Component
 export type ElementProps = Record<string, any>
 export type Element = {
   type: ElementType

@@ -1,16 +1,27 @@
 import { createDOM, updateDOM } from './createDOM'
 import type { Element } from './createElement'
 import { Fiber, getDeletions, getNextUnitWork, getWipRoot, setCurrentRoot, setDeletions, setNextUnitWork, setWipRoot } from "./fiberMeta"
+import { setHookIndex, setWipFiber } from './hooks'
 
 const commitWork = (fiber: Fiber | null) => {
   if (!fiber) return
 
-  const domParent = fiber.parent?.dom
+  let domParentFiber = fiber.parent
+  while(!domParentFiber?.dom) {
+    if (!domParentFiber) break;
+    domParentFiber = domParentFiber?.parent
+  }
+
+  if (!domParentFiber) return;
+
+  const domParent = domParentFiber.dom
+
 
   if (fiber.effectTag === "PLACEMENT" && !!fiber.dom) {
     domParent?.appendChild(fiber.dom as HTMLElement | Text)
   } else if (fiber.effectTag === "DELETION" && !!fiber.dom) {
-    domParent?.removeChild(fiber.dom)
+    // domParent?.removeChild(fiber.dom)
+    commitDeletion(fiber, domParent)
   } else if (fiber.effectTag === "UPDATE" && !!fiber.dom) {
     updateDOM(
       fiber.dom,
@@ -21,6 +32,18 @@ const commitWork = (fiber: Fiber | null) => {
 
   commitWork(fiber.child)
   commitWork(fiber.sibling)
+}
+
+const commitDeletion = (fiber: Fiber | null, domParent: HTMLElement | Text | null) => {
+  if (!fiber) return;
+  if (!domParent) return;
+
+  if (fiber.dom) {
+    domParent.removeChild(fiber.dom)
+  } else {
+    // 如果是 function 组件，则删除 fiber 的 child。 注：因为我们的实现是，组件的fiberNode 只有一个child，那就是 return 的 element
+    commitDeletion(fiber.child, domParent)
+  }
 }
 
 const commitRoot = () => {
@@ -64,23 +87,42 @@ export const workLoop = (deadline: IdleDeadline): void => {
   requestIdleCallback(workLoop)
 }
 
-// react 内部已经不再使用 requestIdleCallback API， 使用了 scheduler package
-// requestIdleCallback(workLoop)
 
-const performUnitOfWork = (fiber: Fiber): Fiber | null => {
+
+const updateHostComponent = (fiber: Fiber) => {
   // add dom node
   if (!fiber.dom) {
     fiber.dom = createDOM(fiber)
   }
 
-  // 可能会看到残缺的 ui。 需要去监听 根 fiber,
-  // if (fiber.parent) {
-  //   fiber.parent.dom?.appendChild(fiber.dom)
-  // }
-
   // create new fibers
   const elements = fiber.props.children
   reconcileChildren(fiber, elements)
+}
+
+const updateFunctionComponent = (fiber: Fiber) => {
+  if ( typeof fiber.type === "string") return;
+
+  fiber.hooks = []
+  setWipFiber(fiber)
+  setHookIndex(0)
+
+
+  const children = [fiber.type(fiber.props)]
+  reconcileChildren(fiber, children)
+}
+
+
+const performUnitOfWork = (fiber: Fiber): Fiber | null => {
+
+  const isFunctionComponent = fiber.type instanceof Function
+
+  if (isFunctionComponent) {
+    updateFunctionComponent(fiber)
+  } else {
+    updateHostComponent(fiber)
+  }
+
 
   // return next unit of work
 

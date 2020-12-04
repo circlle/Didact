@@ -1,19 +1,17 @@
 import Didact from "../../src/index"
 
-let count = 0
-
-function rerender() {
-  count++
-  Didact.render(
-    <div>
-      <p>
-        <span>{count}</span>
-      </p>
-      <button onClick={rerender}>增加</button>
-    </div>,
-    document.getElementById("root")
+function Counter() {
+  const [state, setState] = Didact.useState(1)
+  return (
+    <h1 onClick={() => setState(c => c + 1)}>
+      Count: {state}
+    </h1>
   )
 }
 
-rerender()
+const element = <Counter />
 
+Didact.render(
+  element,
+  document.getElementById("root")
+)

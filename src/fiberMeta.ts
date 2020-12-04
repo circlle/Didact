@@ -1,4 +1,5 @@
 import type { Element } from './createElement'
+import { Hook } from './hooks'
 
 export type Fiber = {
   parent: Fiber | null
@@ -6,6 +7,7 @@ export type Fiber = {
   sibling: Fiber | null
   dom: HTMLElement | Text | null
   alternate?: Fiber | null
+  hooks?: Hook[]
   effectTag?: "UPDATE" | "DELETION" | "PLACEMENT"
 } & Element
 
