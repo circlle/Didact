@@ -1,17 +1,28 @@
 import Didact from "../../src/index"
 
-function Counter() {
-  const [state, setState] = Didact.useState(1)
+function Counter(props) {
+  // const [state, setState] = Didact.useState(1)
   return (
-    <h1 onClick={() => setState(c => c + 1)}>
-      Count: {state}
+    <h1>
+      Count: {props.count}
     </h1>
   )
 }
 
-const element = <Counter />
 
 Didact.render(
-  element,
+  <Counter count={1}/>,
   document.getElementById("root")
 )
+
+Didact.render(
+  <Counter count={2}/>,
+  document.getElementById("root")
+)
+
+setTimeout(() => {
+  Didact.render(
+    <Counter count={8}/>,
+    document.getElementById("root")
+  )
+}, 5000);
