@@ -1,28 +1,22 @@
-import Didact from "../../src/index"
+import Didact, { useState } from "../../src/index"
 
 function Counter(props) {
-  // const [state, setState] = Didact.useState(1)
+  const [age, setAge] = useState(1)
+  const [name, setName] = useState("dora")
   return (
-    <h1>
-      Count: {props.count}
-    </h1>
+    <div>
+      <h1 onClick={() => setAge(age => age + 1)}>
+        age: {age}
+      </h1>
+      <h1 onClick={() => setName(name === "kxzhang" ? "dora" : "kxzhang")}>
+        name: {name}
+      </h1>
+    </div>
   )
 }
 
 
 Didact.render(
-  <Counter count={1}/>,
+  <Counter />,
   document.getElementById("root")
 )
-
-Didact.render(
-  <Counter count={2}/>,
-  document.getElementById("root")
-)
-
-setTimeout(() => {
-  Didact.render(
-    <Counter count={8}/>,
-    document.getElementById("root")
-  )
-}, 5000);

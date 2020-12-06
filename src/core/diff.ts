@@ -1,7 +1,8 @@
 import { Element, isComponentElement, isDomElement } from './createElement'
 import type { ComponentFiber, DomFiber, Fiber } from './createFiber'
 import { createDOM, updateDOM } from './createOrUpdateDom'
-import { getDeletions, setDeletions, setRootFiber } from './global'
+import { getDeletions, setCurrentFiber, setDeletions, setRootFiber } from './global'
+import { setHookIndex } from './hooks'
 
 const commitWork = (fiber?: Fiber) => {
   if (!fiber) return
@@ -74,6 +75,10 @@ const reconcile = (newFiber: Fiber): void => {
 // diff fiber
 const performUnitOfWork = (fiber: Fiber): Fiber => {
   if (fiber.kind === 'component') {
+    fiber.hooks = []
+    setCurrentFiber(fiber)
+    setHookIndex(0)
+
     const children = [fiber.origin.type(fiber.origin.props)]
     reconcileChildren(fiber, children)
   } else if (fiber.kind === 'dom') {

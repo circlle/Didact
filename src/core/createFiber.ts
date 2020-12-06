@@ -1,5 +1,5 @@
 import { ComponentElement, DomElement, Element, isComponentElement, isDomElement, isTextElement, TextElement } from "./createElement";
-
+import type { Hook } from "./hooks"
 export type BaseFiber = {
   type: Element["type"]
   origin: Element
@@ -10,7 +10,12 @@ export type BaseFiber = {
 }
 
 export type DomFiber = BaseFiber & { origin: DomElement | TextElement, kind: "dom", dom: HTMLElement | Text | null, alternate?: DomFiber  }
-export type ComponentFiber = BaseFiber & { origin: ComponentElement, kind: "component", alternate?: ComponentFiber }
+export type ComponentFiber = BaseFiber & { 
+  origin: ComponentElement, 
+  kind: "component", 
+  hooks?: Hook[]
+  alternate?: ComponentFiber,
+}
 export type Fiber = DomFiber | ComponentFiber
 
 
