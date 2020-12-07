@@ -1,13 +1,6 @@
 import { DomFiber } from './createFiber'
 import { reconcile } from './diff'
-import {
-  getCurrentFiber,
-  getCurrentRootFiber,
-  getRootFiber,
-  setCurrentRootFiber,
-  setDeletions,
-  setRootFiber,
-} from './global'
+import { getCurrentFiber, getRootFiber, setDeletions, setRootFiber } from './global'
 
 export type Hook = {
   // state
@@ -36,13 +29,12 @@ const useState = (initialState) => {
 
   const actions = maybeOldHook ? maybeOldHook.queue : []
   actions.forEach((action) => {
-
     hook.state = action(hook.state)
   })
 
   const setState = (action) => {
     if (!(action instanceof Function)) {
-      const value = action;
+      const value = action
       action = () => value
     }
     hook.queue.push(action)
@@ -66,4 +58,32 @@ const useState = (initialState) => {
   return [hook.state, setState]
 }
 
-export { useState }
+const useEffect = (callback, depArray) => {
+  const currentFiber = getCurrentFiber()
+  if (!currentFiber) return
+  if (currentFiber.kind !== 'component') return
+
+  const hookIndex = getHookIndex()
+  const maybeHooks = currentFiber.alternate?.hooks || []
+  const maybeOldHook = maybeHooks[hookIndex]
+
+  const isFirst = !maybeOldHook
+
+  const hook: Hook = {
+    state: maybeOldHook ? maybeOldHook.state : [],
+    queue: [],
+  }
+
+  const hasNoDeeps = !depArray
+  const oldDeps = hook.state
+  const hasChangedDeps = hasNoDeeps ? true : oldDeps ? !depArray.every((el, i) => el === oldDeps[i]) : true
+  
+  currentFiber.hooks = currentFiber.hooks ? [...currentFiber.hooks, hook] : [hook]
+  if (isFirst || hasNoDeeps || hasChangedDeps) {
+    currentFiber.effectFuncList = currentFiber.effectFuncList ? [...currentFiber.effectFuncList, callback] : [callback]
+    hook.state = depArray
+  }
+  succHookIndex()
+}
+
+export { useState, useEffect }

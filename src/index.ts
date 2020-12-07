@@ -1,15 +1,17 @@
-import { render, createElement, useState } from "./core"
+import { render, createElement, useState, useEffect } from "./core"
 
 const Didact = {
   render,
   createElement,
-  useState
+  useState,
+  useEffect
 }
 
 export {
   render,
   createElement,
-  useState
+  useState,
+  useEffect
 }
 
 export default Didact

@@ -14,6 +14,7 @@ export type ComponentFiber = BaseFiber & {
   origin: ComponentElement, 
   kind: "component", 
   hooks?: Hook[]
+  effectFuncList?: (() => void)[]
   alternate?: ComponentFiber,
 }
 export type Fiber = DomFiber | ComponentFiber

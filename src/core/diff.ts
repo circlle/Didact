@@ -37,6 +37,14 @@ const commitWork = (fiber?: Fiber) => {
       break
   }
   commitWork(fiber.child)
+
+  // HEAR DONE
+  if (fiber.kind === "component") {
+    if (fiber.effectFuncList) {
+      fiber.effectFuncList.forEach(callback => callback())
+    }
+  }
+
   commitWork(fiber.sibling)
 }
 const commitPlacement = (fiber: Fiber | undefined, dom: HTMLElement | Text) => {

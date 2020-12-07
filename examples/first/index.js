@@ -1,8 +1,19 @@
-import Didact, { useState } from "../../src/index"
+import Didact, { useState, useEffect } from "../../src/index"
 
 function Counter(props) {
   const [age, setAge] = useState(1)
   const [name, setName] = useState("dora")
+  useEffect(
+    () => {
+      console.log("enter useEffect", { age, name })
+    },
+    [age]
+  )
+  useEffect(
+    () => {
+      console.log("enter effect2", {age, name})
+    }
+  )
   return (
     <div>
       <h1 onClick={() => setAge(age => age + 1)}>

@@ -1,5 +1,5 @@
 import { createElement } from "./createElement"
 import { render } from "./render"
-import { useState } from "./hooks"
+import { useState, useEffect } from "./hooks"
 
-export { createElement, render, useState }
+export { createElement, render, useState, useEffect }
