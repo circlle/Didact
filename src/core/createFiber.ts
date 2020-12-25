@@ -16,6 +16,7 @@ export type ComponentFiber = BaseFiber & {
   hooks?: Hook[]
   effectFuncList?: (() => void)[]
   alternate?: ComponentFiber,
+  errorBoundary?: (err: {type: "plain" | "effect", name?: string, err: Error}) => void
 }
 export type Fiber = DomFiber | ComponentFiber
 

@@ -1,4 +1,4 @@
-import { DomFiber } from './createFiber'
+import { ComponentFiber, DomFiber, Fiber } from './createFiber'
 import { reconcile } from './diff'
 import { getCurrentFiber, getRootFiber, setDeletions, setRootFiber } from './global'
 
@@ -13,6 +13,14 @@ let hookIndex = 0
 export const setHookIndex = (index: number) => (hookIndex = index)
 export const getHookIndex = () => hookIndex
 export const succHookIndex = () => setHookIndex(getHookIndex() + 1)
+
+const useErrorBoundary = (callback: ComponentFiber["errorBoundary"]) => {
+  const currentFiber = getCurrentFiber()
+  if (!currentFiber) return
+  if (currentFiber.kind !== 'component') return
+
+  currentFiber.errorBoundary = callback
+}
 
 const useState = (initialState) => {
   const currentFiber = getCurrentFiber()
@@ -62,6 +70,18 @@ const useEffect = (callback, depArray) => {
   const currentFiber = getCurrentFiber()
   if (!currentFiber) return
   if (currentFiber.kind !== 'component') return
+  const rawCallback = callback
+
+  if (currentFiber.errorBoundary) {
+    callback = () => {
+      try {
+        rawCallback()
+      } catch (error) {
+        if (!currentFiber.errorBoundary) return;
+        currentFiber.errorBoundary({type: "effect", name: currentFiber.origin.type.name,  err: error})        
+      }
+    }
+  }
 
   const hookIndex = getHookIndex()
   const maybeHooks = currentFiber.alternate?.hooks || []
@@ -86,4 +106,4 @@ const useEffect = (callback, depArray) => {
   succHookIndex()
 }
 
-export { useState, useEffect }
+export { useState, useEffect, useErrorBoundary }

@@ -87,7 +87,22 @@ const performUnitOfWork = (fiber: Fiber): Fiber => {
     setCurrentFiber(fiber)
     setHookIndex(0)
 
-    const children = [fiber.origin.type(fiber.origin.props)]
+    if (fiber.origin.props._errorBoundaryFromParent) {
+      fiber.errorBoundary = fiber.origin.props._errorBoundaryFromParent
+    }
+    let element: Element | null = null;
+    try {
+      element = fiber.origin.type(fiber.origin.props)
+    } catch (error) {
+      element = null
+      if (fiber.errorBoundary) {
+        fiber.errorBoundary({type: "plain", name: fiber.origin.type.name, err: error})
+      } else {
+        throw error
+      }
+    }
+    fiber.origin.props._errorBoundaryFromParent = fiber.errorBoundary
+    const children = element ? [element] : []
     reconcileChildren(fiber, children)
   } else if (fiber.kind === 'dom') {
     if (!fiber.dom) fiber.dom = createDOM(fiber)
